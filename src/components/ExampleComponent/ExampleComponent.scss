@@ -1,0 +1,11 @@
+@import '../../scss/1-utils/#index';
+
+.example-component {
+  color: red;
+  border: 1px solid blue;
+
+  @include tablet {
+    color: blue;
+    border: 1px solid red;
+  }
+}
