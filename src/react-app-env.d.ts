@@ -1,1 +1,1 @@
-/// <reference types="react-scripts" />
+export type ReadonlyRecord<T> = Record<T> & Readonly<T>;
