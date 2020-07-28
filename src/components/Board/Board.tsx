@@ -1,20 +1,24 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
-import React, { useState } from 'react';
+import React from 'react';
 
 import { List } from 'immutable';
 
 import './Board.scss';
 
-type BoardProps = {
+export type BoardProps = {
   paused: boolean,
-  width: number,
-  height: number,
+  grid: List<boolean>,
+  setGrid: React.Dispatch<React.SetStateAction<List<boolean>>>,
+  setGeneration: React.Dispatch<React.SetStateAction<number>>,
 }
 
-function Board({ width, height, paused }: BoardProps) {
-  const [grid, setGrid] = useState(List<boolean>(Array(width * height).fill(false)));
-
+function Board({
+  paused,
+  grid,
+  setGrid,
+  setGeneration,
+}: BoardProps) {
   return (
     <div className="board">
       {grid.map((alive, index) => (
@@ -22,7 +26,8 @@ function Board({ width, height, paused }: BoardProps) {
           className={`cell ${alive ? 'alive' : ''}`}
           onClick={() => {
             if (!paused) return;
-            setGrid((oldGridState) => (oldGridState.set(index, !oldGridState.get(index))));
+            setGeneration(0);
+            setGrid(grid.set(index, !grid.get(index)));
           }}
         />
       ))}
