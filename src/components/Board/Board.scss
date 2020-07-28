@@ -4,24 +4,23 @@
   grid-template-columns: repeat(25, minmax(1px, 1fr));
   grid-template-rows: repeat(25, auto);
   gap: 1px;
+  padding: 1px;
 
   .cell {
     width: 100%;
     display: relative;
     margin: 0;
     padding: 0;
+    background-color: white;
 
     &:after {
       content: "";
       display: block;
       padding-bottom: 100%;
     }
-  }
 
-  .on {
-    background-color: black;
-  }
-  .off {
-    background-color: white;
+    &.alive {
+      background-color: black;
+    }
   }
 }
