@@ -1,3 +1,4 @@
+export { buildMemoziedGetNeighborIndexes } from './buildMemoizedGetNeighborIndex';
 export { filterObject } from './filterObject';
-export { newRecord } from './newRecord';
 export { isValidPosition } from './isValidPosition';
+export { newRecord } from './newRecord';

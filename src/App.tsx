@@ -2,79 +2,63 @@ import React, { useState, useEffect } from 'react';
 import { List } from 'immutable';
 
 import Board from './components/Board';
+import { buildMemoziedGetNeighborIndexes } from './utils';
 
 import './App.scss';
-import { isValidPosition } from './utils';
+
+function nullFunction() {}
+const nullInterval = setTimeout(nullFunction, 1);
 
 function App() {
   const [paused, setPaused] = useState(true);
   const [generation, setGeneration] = useState(0);
+  const [timeDelay, setTimeDelay] = useState(1000);
   const [width] = useState(25);
   const [height] = useState(25);
   const [grid, setGrid] = useState(List<boolean>(Array(width * height).fill(false)));
+  const [history, setHistory] = useState(List([grid]));
   const [finished, setFinished] = useState(false);
+  const [stepper, setStepper] = useState(nullInterval);
 
-  function buildMemoziedGetNeighborIndexes(size: number) {
-    const cache = Array<number[]>(size);
-
-    const getNeighborIndexes = (index: number) => {
-      const result = [];
-      const x = index % width;
-      const y = Math.floor((index - x) / width);
-
-      for (let yOffset = -1; yOffset < 2; yOffset += 1) {
-        for (let xOffset = -1; xOffset < 2; xOffset += 1) {
-          if (
-            isValidPosition({
-              x: x + xOffset,
-              y: y + yOffset,
-              width,
-              height,
-            })
-            && (xOffset !== 0 || yOffset !== 0)
-          ) result.push((y + yOffset) * width + (x + xOffset));
-        }
-      }
-
-      return result;
-    };
-
-    return ((index: number) => {
-      if (cache[index] !== undefined) return cache[index];
-      cache[index] = getNeighborIndexes(index);
-      return cache[index];
-    });
-  }
-
-  const memGetNeighborIndexes = buildMemoziedGetNeighborIndexes(width * height);
+  const memGetNeighborIndexes = buildMemoziedGetNeighborIndexes(width, height);
 
   function setNextGeneration() {
-    const newGrid = grid.map((item, index, referenceGrid) => {
-      const currentlyAlive = referenceGrid.get(index);
+    const newGrid = grid.map((item, index) => {
+      const currentlyAlive = grid.get(index);
       const neighborIndexes = memGetNeighborIndexes(index);
       const aliveNeighborsCount = neighborIndexes.reduce((count, neighborIndex) => (
-        count + (referenceGrid.get(neighborIndex) ? 1 : 0)
+        count + (grid.get(neighborIndex) ? 1 : 0)
       ), 0);
 
+      // console.log(`index: ${index}; currentlyAlive: ${currentlyAlive}; aliveNeighborsCount: ${aliveNeighborsCount}`);
       return (currentlyAlive)
         ? (aliveNeighborsCount === 2 || aliveNeighborsCount === 3)
         : (aliveNeighborsCount === 3);
     });
 
     if (newGrid === grid) setFinished(true);
+    else {
+      setHistory((oldHistory) => oldHistory.push(newGrid));
+      setGrid(newGrid);
+    }
   }
 
   useEffect(() => {
-    if (paused) return () => false;
-    const interval = setInterval(setNextGeneration, 500);
-    return () => clearInterval(interval);
-  }, [paused]);
+    console.log('line 43')
+    if (paused || finished) {
+      clearTimeout(stepper);
+      setStepper(nullInterval);
+    } else setStepper(setTimeout(setNextGeneration, timeDelay));
+    return () => clearTimeout(stepper);
+    // eslint-disable-next-line
+  }, [paused, finished, grid]);
 
   const boardProps = {
     paused,
     setGeneration,
     grid,
     setGrid,
+    setHistory,
   };
 
   return (

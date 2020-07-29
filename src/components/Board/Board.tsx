@@ -2,6 +2,7 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 import React from 'react';
 
+// eslint-disable-next-line no-unused-vars
 import { List } from 'immutable';
 
 import './Board.scss';
@@ -11,6 +12,7 @@ export type BoardProps = {
   grid: List<boolean>,
   setGrid: React.Dispatch<React.SetStateAction<List<boolean>>>,
   setGeneration: React.Dispatch<React.SetStateAction<number>>,
+  setHistory: React.Dispatch<React.SetStateAction<List<List<boolean>>>>
 }
 
 function Board({
@@ -18,6 +20,7 @@ function Board({
   grid,
   setGrid,
   setGeneration,
+  setHistory,
 }: BoardProps) {
   return (
     <div className="board">
@@ -27,7 +30,9 @@ function Board({
           onClick={() => {
             if (!paused) return;
             setGeneration(0);
-            setGrid(grid.set(index, !grid.get(index)));
+            const newGrid = grid.set(index, !grid.get(index));
+            setHistory((oldHistory) => oldHistory.push(newGrid));
+            setGrid(newGrid);
           }}
         />
       ))}
