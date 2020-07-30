@@ -6,19 +6,17 @@ import { buildMemoziedGetNeighborIndexes } from './utils';
 
 import './App.scss';
 
-function nullFunction() {}
-const nullInterval = setTimeout(nullFunction, 1);
-
 function App() {
   const [paused, setPaused] = useState(true);
   const [generation, setGeneration] = useState(0);
   const [timeDelay, setTimeDelay] = useState(1000);
   const [width] = useState(25);
   const [height] = useState(25);
-  const [grid, setGrid] = useState(List<boolean>(Array(width * height).fill(false)));
+  const [defaultGrid] = useState(List<boolean>(Array(width * height).fill(false)));
+  const [grid, setGrid] = useState(defaultGrid);
   const [history, setHistory] = useState(List([grid]));
   const [finished, setFinished] = useState(false);
-  const [stepper, setStepper] = useState(nullInterval);
+  const [stepper, setStepper] = useState(setTimeout(() => null, 1));
 
   const memGetNeighborIndexes = buildMemoziedGetNeighborIndexes(width, height);
 
@@ -30,7 +28,6 @@ function App() {
         count + (grid.get(neighborIndex) ? 1 : 0)
       ), 0);
 
-      // console.log(`index: ${index}; currentlyAlive: ${currentlyAlive}; aliveNeighborsCount: ${aliveNeighborsCount}`);
       return (currentlyAlive)
         ? (aliveNeighborsCount === 2 || aliveNeighborsCount === 3)
         : (aliveNeighborsCount === 3);
@@ -39,16 +36,14 @@ function App() {
     if (newGrid === grid) setFinished(true);
     else {
       setHistory((oldHistory) => oldHistory.push(newGrid));
+      setGeneration((oldGeneration) => oldGeneration + 1);
       setGrid(newGrid);
     }
   }
 
   useEffect(() => {
-    console.log('line 43')
-    if (paused || finished) {
-      clearTimeout(stepper);
-      setStepper(nullInterval);
-    } else setStepper(setTimeout(setNextGeneration, timeDelay));
+    if (paused || finished) clearTimeout(stepper);
+    else setStepper(setTimeout(setNextGeneration, timeDelay));
     return () => clearTimeout(stepper);
     // eslint-disable-next-line
   }, [paused, finished, grid]);
@@ -63,7 +58,25 @@ function App() {
 
   return (
     <>
-      <button type="button" onClick={() => setPaused(!paused)}>{paused ? 'play' : 'pause'}</button>
+      <button
+        type="button"
+        onClick={() => {
+          if (finished) return;
+          setPaused(!paused);
+        }}
+      >
+        {paused ? 'play' : 'pause'}
+      </button>
+      <button
+        type="button"
+        onClick={() => {
+          setPaused(true);
+          setGeneration(0);
+          setGrid(defaultGrid);
+        }}
+      >
+        clear
+      </button>
       <div className="generation-counter">{generation}</div>
       <Board {...boardProps} />
     </>
