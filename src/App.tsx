@@ -88,6 +88,15 @@ function App() {
           setFinished(false);
           setGeneration(0);
           setGrid(defaultGrid);
+          setHistory((oldHistory) => {
+            const tail = oldHistory.get(-1);
+            return oldHistory.push((tail !== undefined)
+              ? tail.clear()
+              : newRecord({ defaultValues: {
+                grid: defaultGrid,
+                generation: 0,
+              }}));
+          });
         }}
       >
         clear
