@@ -1,1 +1,6 @@
-export type ReadonlyRecord<T> = Record<T> & Readonly<T>;
+// eslint-disable-next-line
+import { Record } from 'immutable';
+
+export interface ReadonlyRecord<T> extends Record<T>, Readonly<T> {
+  // intentionally empty
+}

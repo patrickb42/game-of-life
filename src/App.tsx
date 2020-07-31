@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { List } from 'immutable';
 
 import Board from './components/Board';
-import { buildMemoziedGetNeighborIndexes } from './utils';
+import { buildMemoziedGetNeighborIndexes, newRecord } from './utils';
 
 import './App.scss';
 
@@ -14,7 +14,12 @@ function App() {
   const [height] = useState(25);
   const [defaultGrid] = useState(List<boolean>(Array(width * height).fill(false)));
   const [grid, setGrid] = useState(defaultGrid);
-  const [history, setHistory] = useState(List([grid]));
+  const [history, setHistory] = useState(List([newRecord({
+    defaultValues: {
+      grid,
+      generation,
+    },
+  })]));
   const [finished, setFinished] = useState(false);
   const [stepper, setStepper] = useState(setTimeout(() => null, 1));
 
@@ -35,7 +40,16 @@ function App() {
 
     if (newGrid === grid) setFinished(true);
     else {
-      setHistory((oldHistory) => oldHistory.push(newGrid));
+      setHistory((oldHistory) => {
+        const nextEntry = {
+          grid: newGrid,
+          generation: 0,
+        };
+        const tail = oldHistory.get(-1);
+        return oldHistory.push((tail !== undefined)
+          ? tail.merge(nextEntry)
+          : newRecord({ defaultValues: nextEntry }));
+      });
       setGeneration((oldGeneration) => oldGeneration + 1);
       setGrid(newGrid);
     }
@@ -54,28 +68,38 @@ function App() {
     grid,
     setGrid,
     setHistory,
+    setFinished,
   };
 
   return (
     <>
       <button
         type="button"
-        onClick={() => {
-          if (finished) return;
-          setPaused(!paused);
-        }}
+        disabled={finished}
+        onClick={() => setPaused(!paused)}
       >
         {paused ? 'play' : 'pause'}
       </button>
       <button
         type="button"
+        disabled={generation === 0}
         onClick={() => {
           setPaused(true);
+          setFinished(false);
           setGeneration(0);
           setGrid(defaultGrid);
         }}
       >
         clear
+      </button>
+      <button
+        type="button"
+        disabled={finished || grid === defaultGrid}
+        onClick={() => {
+          setNextGeneration();
+        }}
+      >
+        step
       </button>
       <div className="generation-counter">{generation}</div>
       <Board {...boardProps} />

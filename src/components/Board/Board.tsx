@@ -5,6 +5,10 @@ import React from 'react';
 // eslint-disable-next-line no-unused-vars
 import { List } from 'immutable';
 
+import { newRecord } from '../../utils';
+// eslint-disable-next-line no-unused-vars
+import { ReadonlyRecord } from '../../react-app-env';
+
 import './Board.scss';
 
 export type BoardProps = {
@@ -12,7 +16,11 @@ export type BoardProps = {
   grid: List<boolean>,
   setGrid: React.Dispatch<React.SetStateAction<List<boolean>>>,
   setGeneration: React.Dispatch<React.SetStateAction<number>>,
-  setHistory: React.Dispatch<React.SetStateAction<List<List<boolean>>>>
+  setHistory: React.Dispatch<React.SetStateAction<List<ReadonlyRecord<{
+    grid: List<boolean>;
+    generation: number;
+}>>>>,
+  setFinished: React.Dispatch<React.SetStateAction<boolean>>,
 }
 
 function Board({
@@ -21,6 +29,7 @@ function Board({
   setGrid,
   setGeneration,
   setHistory,
+  setFinished,
 }: BoardProps) {
   return (
     <div className="board">
@@ -30,8 +39,18 @@ function Board({
           onClick={() => {
             if (!paused) return;
             setGeneration(0);
+            setFinished(false);
             const newGrid = grid.set(index, !grid.get(index));
-            setHistory((oldHistory) => oldHistory.push(newGrid));
+            setHistory((oldHistory) => {
+              const nextEntry = {
+                grid: newGrid,
+                generation: 0,
+              };
+              const tail = oldHistory.get(-1);
+              return oldHistory.push((tail !== undefined)
+                ? tail.merge(nextEntry)
+                : newRecord({ defaultValues: nextEntry }));
+            });
             setGrid(newGrid);
           }}
         />
