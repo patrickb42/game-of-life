@@ -84,7 +84,7 @@ function App() {
       </button>
       <button
         type="button"
-        disabled={generation === 0}
+        disabled={generation === 0 && !finished}
         onClick={() => {
           setPaused(true);
           setFinished(false);
@@ -94,10 +94,12 @@ function App() {
             const tail = oldHistory.get(-1);
             return oldHistory.push((tail !== undefined)
               ? tail.clear()
-              : newRecord({ defaultValues: {
-                grid: defaultGrid,
-                generation: 0,
-              }}));
+              : newRecord({
+                defaultValues: {
+                  grid: defaultGrid,
+                  generation: 0,
+                },
+              }));
           });
         }}
       >
