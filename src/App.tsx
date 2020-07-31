@@ -63,6 +63,8 @@ function App() {
   }, [paused, finished, grid]);
 
   const boardProps = {
+    width,
+    height,
     paused,
     setGeneration,
     grid,
@@ -103,7 +105,7 @@ function App() {
       </button>
       <button
         type="button"
-        disabled={finished || grid === defaultGrid}
+        disabled={finished || !paused || grid === defaultGrid}
         onClick={() => {
           setNextGeneration();
         }}

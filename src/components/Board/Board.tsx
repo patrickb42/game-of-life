@@ -23,40 +23,42 @@ export type BoardProps = {
   setFinished: React.Dispatch<React.SetStateAction<boolean>>,
 }
 
-function Board({
+const Board = ({
   paused,
   grid,
   setGrid,
   setGeneration,
   setHistory,
   setFinished,
-}: BoardProps) {
-  return (
-    <div className="board">
-      {grid.map((alive, index) => (
-        <div
-          className={`cell ${alive ? 'alive' : ''}`}
-          onClick={() => {
-            if (!paused) return;
-            setGeneration(0);
-            setFinished(false);
-            const newGrid = grid.set(index, !grid.get(index));
-            setHistory((oldHistory) => {
-              const nextEntry = {
-                grid: newGrid,
-                generation: 0,
-              };
-              const tail = oldHistory.get(-1);
-              return oldHistory.push((tail !== undefined)
-                ? tail.merge(nextEntry)
-                : newRecord({ defaultValues: nextEntry }));
-            });
-            setGrid(newGrid);
-          }}
-        />
-      ))}
-    </div>
+}: BoardProps) => {
+  const createCells = () => (grid.map((alive, index) => (
+    <div
+      className={`cell ${alive ? 'alive' : ''}`}
+      onClick={() => {
+        if (!paused) return;
+        setGeneration(0);
+        setFinished(false);
+        const newGrid = grid.set(index, !grid.get(index));
+        setHistory((oldHistory) => {
+          const nextEntry = {
+            grid: newGrid,
+            generation: 0,
+          };
+          const tail = oldHistory.get(-1);
+          return oldHistory.push((tail !== undefined)
+            ? tail.merge(nextEntry)
+            : newRecord({ defaultValues: nextEntry }));
+        });
+        setGrid(newGrid);
+      }}
+    />
+  ))
+
   );
-}
+
+  return (
+    <div className="board">{createCells()}</div>
+  );
+};
 
 export default Board;
