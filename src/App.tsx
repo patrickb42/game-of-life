@@ -2,14 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { List } from 'immutable';
 
 import Board from './components/Board';
+import Slider from './components/Slider';
+
 import { buildMemoziedGetNeighborIndexes, newRecord } from './utils';
 
 import './App.scss';
+import { Z_BEST_SPEED } from 'zlib';
 
 function App() {
   const [paused, setPaused] = useState(true);
   const [generation, setGeneration] = useState(0);
-  const [timeDelay, setTimeDelay] = useState(1000);
+  const [timeDelay, setTimeDelay] = useState(500);
   const [width] = useState(25);
   const [height] = useState(25);
   const [defaultGrid] = useState(List<boolean>(Array(width * height).fill(false)));
@@ -73,6 +76,11 @@ function App() {
     setFinished,
   };
 
+  const sliderProps = {
+    label: 'speed',
+    setTimeDelay,
+  };
+
   return (
     <>
       <button
@@ -114,7 +122,30 @@ function App() {
       >
         step
       </button>
-      <div className="generation-counter">{generation}</div>
+      <button
+        type="button"
+        onClick={() => {
+          setPaused(true);
+          setFinished(false);
+          setGeneration(0);
+          const newGrid = grid.map(() => ((Math.random() * 2) < 1));
+          setHistory((oldHistory) => {
+            const nextEntry = {
+              grid: newGrid,
+              generation: 0,
+            };
+            const tail = oldHistory.get(-1);
+            return oldHistory.push((tail !== undefined)
+              ? tail.merge(nextEntry)
+              : newRecord({ defaultValues: nextEntry }));
+          });
+          setGrid(newGrid);
+        }}
+      >
+        random
+      </button>
+      <Slider {...sliderProps} />
+      <div className="generation-counter">{`generation: ${generation}`}</div>
       <Board {...boardProps} />
     </>
   );
