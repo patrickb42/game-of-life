@@ -7,7 +7,6 @@ import Slider from './components/Slider';
 import { buildMemoziedGetNeighborIndexes, newRecord } from './utils';
 
 import './App.scss';
-import { Z_BEST_SPEED } from 'zlib';
 
 function App() {
   const [paused, setPaused] = useState(true);
