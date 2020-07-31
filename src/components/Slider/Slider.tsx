@@ -14,7 +14,7 @@ const Slider = ({
   return (
     <>
       <div className="slidecontainer">
-        <label>
+        <label htmlFor="speed-slider">
           {label}
           <br />
           <input
@@ -23,6 +23,7 @@ const Slider = ({
             max="999"
             value={value}
             className="slider"
+            id="speed-slider"
             onChange={(e) => {
               const newValue = parseInt(e.target.value, 10);
               setValue(newValue);
