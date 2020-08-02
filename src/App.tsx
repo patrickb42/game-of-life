@@ -120,6 +120,7 @@ function App() {
       type="button"
       onClick={() => {
         const newGrid = grid.map(() => ((Math.random() * 2) < 1));
+        setGrid(newGrid);
         setPaused(true);
         setFinished(false);
         setGeneration(0);
@@ -133,7 +134,6 @@ function App() {
             ? tail.merge(nextEntry)
             : newRecord({ defaultValues: nextEntry }));
         });
-        setGrid(newGrid);
       }}
     >
       random
