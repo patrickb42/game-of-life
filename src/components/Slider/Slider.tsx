@@ -20,7 +20,7 @@ const Slider = ({
           <input
             type="range"
             min="0"
-            max="999"
+            max="998"
             value={value}
             className="slider"
             id="speed-slider"
