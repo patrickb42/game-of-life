@@ -64,6 +64,88 @@ function App() {
     // eslint-disable-next-line
   }, [paused, finished, grid]);
 
+  const PlayButton = (
+    <button
+      type="button"
+      disabled={finished}
+      onClick={() => {
+        setPaused(!paused);
+      }}
+    >
+      {paused ? 'play' : 'pause'}
+    </button>
+  );
+
+  const ClearButton = (
+    <button
+      type="button"
+      disabled={(generation === 0 && !grid.contains(true)) && !finished}
+      onClick={() => {
+        setPaused(true);
+        setFinished(false);
+        setGeneration(0);
+        setGrid(defaultGrid);
+        setHistory((oldHistory) => {
+          const tail = oldHistory.get(-1);
+          return oldHistory.push((tail !== undefined)
+            ? tail.clear()
+            : newRecord({
+              defaultValues: {
+                grid: defaultGrid,
+                generation: 0,
+              },
+            }));
+        });
+      }}
+    >
+      clear
+    </button>
+  );
+
+  const StepButton = (
+    <button
+      type="button"
+      disabled={finished || !paused || grid === defaultGrid}
+      onClick={() => {
+        setNextGeneration();
+      }}
+    >
+      step
+    </button>
+  );
+
+  const RandomButton = (
+    <button
+      type="button"
+      onClick={() => {
+        setPaused(true);
+        setFinished(false);
+        setGeneration(0);
+        const newGrid = grid.map(() => ((Math.random() * 2) < 1));
+        setHistory((oldHistory) => {
+          const nextEntry = {
+            grid: newGrid,
+            generation: 0,
+          };
+          const tail = oldHistory.get(-1);
+          return oldHistory.push((tail !== undefined)
+            ? tail.merge(nextEntry)
+            : newRecord({ defaultValues: nextEntry }));
+        });
+        setGrid(newGrid);
+      }}
+    >
+      random
+    </button>
+  );
+
+  const sliderProps = {
+    label: 'speed',
+    setTimeDelay,
+  };
+
+  const GenerationCounter = (<div className="generation-counter">{`generation: ${generation}`}</div>);
+
   const boardProps = {
     width,
     height,
@@ -75,76 +157,14 @@ function App() {
     setFinished,
   };
 
-  const sliderProps = {
-    label: 'speed',
-    setTimeDelay,
-  };
-
   return (
     <>
-      <button
-        type="button"
-        disabled={finished}
-        onClick={() => setPaused(!paused)}
-      >
-        {paused ? 'play' : 'pause'}
-      </button>
-      <button
-        type="button"
-        disabled={generation === 0 && !finished}
-        onClick={() => {
-          setPaused(true);
-          setFinished(false);
-          setGeneration(0);
-          setGrid(defaultGrid);
-          setHistory((oldHistory) => {
-            const tail = oldHistory.get(-1);
-            return oldHistory.push((tail !== undefined)
-              ? tail.clear()
-              : newRecord({
-                defaultValues: {
-                  grid: defaultGrid,
-                  generation: 0,
-                },
-              }));
-          });
-        }}
-      >
-        clear
-      </button>
-      <button
-        type="button"
-        disabled={finished || !paused || grid === defaultGrid}
-        onClick={() => {
-          setNextGeneration();
-        }}
-      >
-        step
-      </button>
-      <button
-        type="button"
-        onClick={() => {
-          setPaused(true);
-          setFinished(false);
-          setGeneration(0);
-          const newGrid = grid.map(() => ((Math.random() * 2) < 1));
-          setHistory((oldHistory) => {
-            const nextEntry = {
-              grid: newGrid,
-              generation: 0,
-            };
-            const tail = oldHistory.get(-1);
-            return oldHistory.push((tail !== undefined)
-              ? tail.merge(nextEntry)
-              : newRecord({ defaultValues: nextEntry }));
-          });
-          setGrid(newGrid);
-        }}
-      >
-        random
-      </button>
+      {PlayButton}
+      {ClearButton}
+      {StepButton}
+      {RandomButton}
       <Slider {...sliderProps} />
-      <div className="generation-counter">{`generation: ${generation}`}</div>
+      {GenerationCounter}
       <Board {...boardProps} />
     </>
   );
