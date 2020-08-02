@@ -119,10 +119,10 @@ function App() {
     <button
       type="button"
       onClick={() => {
+        const newGrid = grid.map(() => ((Math.random() * 2) < 1));
         setPaused(true);
         setFinished(false);
         setGeneration(0);
-        const newGrid = grid.map(() => ((Math.random() * 2) < 1));
         setHistory((oldHistory) => {
           const nextEntry = {
             grid: newGrid,
