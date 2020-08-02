@@ -16,7 +16,8 @@ function App() {
   const [height] = useState(25);
   const [defaultGrid] = useState(List<boolean>(Array(width * height).fill(false)));
   const [grid, setGrid] = useState(defaultGrid);
-  const [history, setHistory] = useState(List([newRecord({
+  // const [history, setHistory] = useState(List([newRecord({
+  const [, setHistory] = useState(List([newRecord({
     defaultValues: {
       grid,
       generation,
