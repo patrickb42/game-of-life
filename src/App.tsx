@@ -16,7 +16,6 @@ function App() {
   const [height] = useState(25);
   const [defaultGrid] = useState(List<boolean>(Array(width * height).fill(false)));
   const [grid, setGrid] = useState(defaultGrid);
-  // const [history, setHistory] = useState(List([newRecord({
   const [, setHistory] = useState(List([newRecord({
     defaultValues: {
       grid,
@@ -147,6 +146,26 @@ function App() {
 
   const GenerationCounter = (<div className="generation-counter">{`generation: ${generation}`}</div>);
 
+  const Rules = (
+    <div className="rules">
+      <h4>
+        The Rules:
+        <br />
+        <br />
+        -For a space that is &apos;populated&apos; : Each cell with one or no
+        neighbors dies in solitude.
+        <br />
+        -Each cell with four or more neighbors dies, as if by
+        overpopulation.
+        <br />
+        -Each cell with two or three neighbors survives, for a space
+        that is empty.
+        <br />
+        -Each cell with three neighbors becomes populated.
+      </h4>
+    </div>
+  );
+
   const boardProps = {
     width,
     height,
@@ -167,6 +186,7 @@ function App() {
       <Slider {...sliderProps} />
       {GenerationCounter}
       <Board {...boardProps} />
+      {Rules}
     </>
   );
 }
